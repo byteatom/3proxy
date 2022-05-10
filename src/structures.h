@@ -603,6 +603,8 @@ struct extparam {
 	time_t logtime, time;
 	unsigned logdumpsrv, logdumpcli;
 	char delimchar;
+	int dnsCacheTtlOffset;
+	int dns6CacheTtlOffset;
 };
 
 struct property {

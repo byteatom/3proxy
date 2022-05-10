@@ -622,6 +622,11 @@ static int h_nscache(int argc, unsigned char **argv){
 		fprintf(stderr, "Failed to initialize NS cache\n");
 		return 2;
 	}
+
+	if (argc > 2) {
+		conf.dnsCacheTtlOffset = atoi((char*)argv[2]);
+	}
+
 	return 0;
 }
 
@@ -645,6 +650,11 @@ static int h_nscache6(int argc, unsigned char **argv){
 		fprintf(stderr, "Failed to initialize NS cache\n");
 		return 2;
 	}
+
+	if (argc > 2) {
+		conf.dns6CacheTtlOffset = atoi((char*)argv[2]);
+	}
+
 	return 0;
 }
 
@@ -1565,8 +1575,8 @@ struct commands commandhandlers[]={
 	{commandhandlers+25, "flush", h_flush, 1, 1},
 	{commandhandlers+26, "nserver", h_nserver, 2, 2},
 	{commandhandlers+27, "fakeresolve", h_fakeresolve, 1, 1},
-	{commandhandlers+28, "nscache", h_nscache, 2, 2},
-	{commandhandlers+29, "nscache6", h_nscache6, 2, 2},
+	{commandhandlers+28, "nscache", h_nscache, 2, 3},
+	{commandhandlers+29, "nscache6", h_nscache6, 2, 3},
 	{commandhandlers+30, "nsrecord", h_nsrecord, 3, 3},
 	{commandhandlers+31, "dialer", h_dialer, 2, 2},
 	{commandhandlers+32, "system", h_system, 2, 2},

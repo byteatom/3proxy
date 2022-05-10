@@ -1182,16 +1182,25 @@ struct nserver authnserver;
 
 
 unsigned long udpresolve(int af, unsigned char * name, unsigned char * value, unsigned *retttl, struct clientparam* param, int makeauth){
-
 	int i,n;
 	unsigned long retval;
 
-	if((af == AF_INET) && (retval = hashresolv(&dns_table, name, value, retttl))) {
+	char logBuf[1024];
+
+	unsigned ttlTmp = 0;
+	if((af == AF_INET || af == AF_INET6) && (retval = hashresolv(af == AF_INET6 ? &dns6_table : &dns_table, name, value, &ttlTmp))) {
+		char valueStr[64];
+		inet_ntop(af, value, valueStr, sizeof(valueStr));
+		snprintf(logBuf, sizeof(logBuf), "RESOLVED %s to %s TTL %d by cache", name, valueStr, ttlTmp);
+		dolog(param, logBuf);
+		if (retttl) *retttl = ttlTmp;
+
 		return retval;
 	}
-	if((af == AF_INET6) && (retval = hashresolv(&dns6_table, name, value, retttl))) {
-		return retval;
-	}
+	
+	snprintf(logBuf, sizeof(logBuf), "RESOLVE %s by UDP", name);
+	dolog(param, logBuf);
+
 	n = (makeauth && !SAISNULL(&authnserver.addr))? 1 : numservers;
 	for(i=0; i<n; i++){
 		unsigned short nq, na;
@@ -1337,6 +1346,13 @@ unsigned long udpresolve(int af, unsigned char * name, unsigned char * value, un
 				memcpy(value, buf + k + 12, af == AF_INET6? 16:4);
 				if(ttl < 0 || ttl > (3600*12)) ttl = 3600*12;
 				if(!ttl) ttl = 1;
+
+				ttl += (af == AF_INET6 ? conf.dns6CacheTtlOffset : conf.dnsCacheTtlOffset);
+				char valueStr[64];
+				inet_ntop(af, value, valueStr, sizeof(valueStr));
+				snprintf(logBuf, sizeof(logBuf), "RESOLVED %s to %s TTL %d by UDP", name, valueStr, ttl);
+				dolog(param, logBuf);
+
 				hashadd(af == AF_INET6?&dns6_table:&dns_table, name, value, conf.time+ttl);
 				if(retttl) *retttl = ttl;
 				return 1;
