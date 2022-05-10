@@ -1,14 +1,10 @@
 #################
 ## Eclipse
 #################
-
 *.pydevproject
 .project
 .metadata
-*.exe
-*.dll
 *.exp
-*.lib
 *.key
 *.pem
 *.so
@@ -21,12 +17,11 @@ bin/pop3p
 bin/smtpp
 bin/ftppr
 bin/mycrypt
-bin64/
+bin64/*.lib
 dll/
 tmp/
 *.tmp
 *.bak
-*.bat
 *.swp
 *.o
 *.idb
